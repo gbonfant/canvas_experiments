@@ -21,7 +21,9 @@
     animate(step);
   };
 
-  var update = function() {};
+  var update = function() {
+    ball.update(player.paddle, computer.paddle);
+  };
 
   var render = function() {
     context.fillStyle = '#000';
@@ -75,5 +77,55 @@
     context.arc(this.x, this.y, this.radius, Math.PI * 2, false);
     context.fillStyle = '#FFF';
     context.fill();
+  };
+
+  Ball.prototype.update = function(playerPaddle, computerPaddle) {
+    this.x += this.xSpeed;
+    this.y += this.ySpeed;
+
+    var topX    = this.x -5;
+    var topY    = this.y -5;
+    var bottomX = this.x + 5;
+    var bottomY = this.y + 5;
+
+    // ---------------------------------------------------------------------------------------------------------------
+    // AABB collision detection. (http://en.wikipedia.org/wiki/Minimum_bounding_box#Axis-aligned_minimum_bounding_box)
+    // ---------------------------------------------------------------------------------------------------------------
+
+    // Hitting the left wall
+    if (this.x - 5 < 0) {
+      this.x = 5;
+      this.xSpeed = -this.xSpeed;
+    }
+    // Hitting the right wall
+    else if(this.x + 5 > canvas.width) {
+      this.x = canvas.width - 5;
+      this.xSpeed = -this.xSpeed;
+    }
+
+    // Point was scored
+    if (this.y < 0 || this.y > canvas.height) {
+      this.xSpeed = 0;
+      this.ySpeed = 3;
+      this.x = 200;
+      this.y = 300;
+    }
+
+    if (topY >  canvas.height / 2) {
+      // Hit the player's paddle
+      if (topY < (playerPaddle.y + playerPaddle.height) && bottomY > playerPaddle.y && topX < (playerPaddle.x + playerPaddle.width) && bottomX > playerPaddle.x) {
+        this.ySpeed = -3;
+        this.xSpeed += (playerPaddle.xSpeed / 2);
+        this.y += this.ySpeed;
+      }
+    }
+    else {
+      // Hit the computer's paddle
+      if (topY < (computerPaddle.y + computerPaddle.height) && bottomY > computerPaddle.y && topX < (computerPaddle.x + computerPaddle.width) && bottomX > computerPaddle.x) {
+        this.ySpeed = 3;
+        this.xSpeed += (computerPaddle.xSpeed / 2);
+        this.y += this.ySpeed;
+      }
+    }
   };
 })();
