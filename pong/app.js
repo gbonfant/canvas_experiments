@@ -32,6 +32,7 @@
 
   var update = function() {
     player.update();
+    computer.update(ball);
     ball.update(player.paddle, computer.paddle);
   };
 
@@ -113,6 +114,28 @@
 
   Computer.prototype.render = function() {
     this.paddle.render();
+  };
+
+  Computer.prototype.update = function(ball) {
+    var diff = -((this.paddle.x + (this.paddle.width / 2)) -  ball.x);
+
+    // Max speed left
+    if (diff < 0 && diff < -4) {
+      diff = -5;
+    }
+    // Max speed right
+    else if (diff > 0 && diff > 4) {
+      diff = 5;
+    }
+
+    this.paddle.move(diff, 0);
+
+    if (this.paddle.x < 0) {
+      this.paddle.x = 0;
+    }
+    else if (this.paddle.x + this.paddle.width > canvas.width) {
+      this.paddle.x = canvas.width - this.paddle.width;
+    }
   };
 
   Ball.prototype.render = function() {
