@@ -7,9 +7,18 @@
   var player   = new Player();
   var computer = new Computer();
   var ball     = new Ball(200, 300);
+  var keysDown = {};
 
   window.addEventListener('load', function() {
     animate(step);
+  });
+
+  window.addEventListener('keydown', function(event) {
+    keysDown[event.keyCode] = true;
+  });
+
+  window.addEventListener('keyup', function(event) {
+    delete keysDown[event.keyCode];
   });
 
   // 1. Updates the player's paddle, the computer's paddle and the ball.
@@ -22,6 +31,7 @@
   };
 
   var update = function() {
+    player.update();
     ball.update(player.paddle, computer.paddle);
   };
 
@@ -47,6 +57,21 @@
     context.fillRect(this.x, this.y, this.width, this.height);
   };
 
+  Paddle.prototype.move = function(x, y) {
+    this.x += x;
+    this.y += y;
+    this.xSpeed = x;
+    this.ySpeed = y;
+
+    if (this.x < 0) {
+      this.x = 0;
+      this.xSpeed = 0;
+    }
+    else if (this.x + this.width > canvas.width) {
+      this.x = canvas.width - this.width;
+      this.xSpeed = 0;
+    }
+  };
 
   function Player() {
     this.paddle = new Paddle(175, 580, 50, 10);
@@ -66,6 +91,24 @@
 
   Player.prototype.render = function() {
     this.paddle.render();
+  };
+
+  Player.prototype.update = function() {
+    for(var key in keysDown) {
+      var value = Number(key);
+
+      // Left arrow
+      if (value == 37) {
+        this.paddle.move(-4, 0);
+      }
+      // Right arrow
+      else if (value == 39) {
+        this.paddle.move(4, 0);
+      }
+      else {
+        this.paddle.move(0, 0);
+      }
+    }
   };
 
   Computer.prototype.render = function() {
