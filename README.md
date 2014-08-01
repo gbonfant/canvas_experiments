@@ -1,4 +1,5 @@
-canvas_experiments
+Ping pong
 ==================
 
-A series of experiments with HTML5's canvas.
+A ping pong game using HTML5 canvas
+
